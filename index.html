@@ -60,7 +60,128 @@
       text-transform: uppercase;
       color: #9aa2b1;
     }
-    .stat-value{
+    
+    /* Participantes: estilo como la imagen */
+    .label-caps{
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #64748b;
+      font-weight: 900;
+    }
+    .textarea-big{
+      min-height: 150px;
+      padding: 14px 14px;
+      background: #f8fafc;
+      border-radius: 14px;
+      resize: vertical;
+    }
+
+    .participants-block{ margin-top: 12px; }
+
+    /* Barra de tiempo (cuenta regresiva) encima de la línea de selección */
+    .timerbar-wrap{
+  margin: 12px 0 18px;
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+}
+    .timerbar-track{
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  border: 1px solid var(--border);
+  overflow: visible;
+}
+    .timerbar-fill{
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width: 100%;
+  border-radius: 999px;
+  background: #22c55e; /* verde por defecto */
+  transition: width .08s linear, background-color .15s linear;
+  overflow: visible;
+  z-index: 1;
+}
+    
+        .timerbar-sparks{
+      position:absolute;
+      right:0;
+      top:0;
+      width:0;
+      height:0;
+      pointer-events:none;
+      overflow: visible;
+      z-index: 6;
+    }
+    .spark{
+      position:absolute;
+      left:0;
+      top:0;
+      width: var(--w, 6px);
+      height: var(--h, 6px);
+      border-radius: 999px;
+      opacity: 0.95;
+      transform: translate(var(--x0, 0px), var(--y0, -14px)) rotate(0deg) scale(1);
+      animation: sparkBurst var(--dur, 700ms) ease-out forwards;
+      filter: drop-shadow(0 0 10px rgba(255,160,0,.85));
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.95) 0%,
+        rgba(255,210,120,.92) 40%,
+        rgba(255,150,0,.65) 62%,
+        rgba(255,150,0,0) 78%);
+    }
+    .spark.streak{
+      border-radius: 999px;
+      background: linear-gradient(to bottom,
+        rgba(255,255,255,.95) 0%,
+        rgba(255,210,120,.92) 25%,
+        rgba(255,160,0,.8) 55%,
+        rgba(255,160,0,0) 100%);
+      filter: drop-shadow(0 0 12px rgba(255,160,0,.9));
+    }
+    @keyframes sparkBurst{
+      0%{
+        transform: translate(var(--x0, 0px), var(--y0, -14px)) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      100%{
+        transform: translate(calc(var(--x0, 0px) + var(--dx, 0px)),
+                             calc(var(--y0, -14px) + var(--dy, -70px)))
+                   rotate(var(--rot, 0deg))
+                   scale(var(--s, .25));
+        opacity: 0;
+      }
+    }
+    .timerbar-bomb{
+  position:absolute;
+  left:-8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  opacity: .92;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.22));
+  z-index: 7;
+  overflow: visible;
+}
+.timerbar-bomb .bomb-emoji{
+  display: inline-block;
+  transform: scale(var(--bombScale, 0.6));
+  transform-origin: 50% 50%;
+  transition: transform .09s linear;
+  will-change: transform;
+}
+.timerbar-bomb-fixed{ right:auto; }
+.timerbar-bomb.danger{ animation: bombShake .12s infinite; }
+@keyframes bombShake{
+  0%{ transform: translateY(-50%) translateX(0) rotate(0deg); }
+  25%{ transform: translateY(-50%) translateX(-1px) rotate(-2deg); }
+  50%{ transform: translateY(-50%) translateX(1px) rotate(2deg); }
+  75%{ transform: translateY(-50%) translateX(-1px) rotate(2deg); }
+  100%{ transform: translateY(-50%) translateX(1px) rotate(-2deg); }
+}
+.stat-value{
       margin-top: 8px;
       font-size: 28px;
       font-weight: 900;
@@ -248,6 +369,67 @@
       border-color: rgba(22,156,90,.55);
       box-shadow: 0 0 0 3px rgba(22,156,90,.12);
     }
+
+    /* Tiempo como línea con zonas (rojo/amarillo/verde) */
+    .range-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .range-badge{
+      font-size: 12px;
+      font-weight: 900;
+      color: #0b1220;
+      background: #fbfcfe;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    input[type="range"]{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 12px;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #e5e7eb;
+}
+    input[type="range"]:focus{
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(22,156,90,.12);
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid rgba(17,24,39,.55);
+      box-shadow: 0 6px 14px rgba(0,0,0,.16);
+      margin-top: -4px;
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb{
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid rgba(17,24,39,.55);
+      box-shadow: 0 6px 14px rgba(0,0,0,.16);
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-track{
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #e5e7eb;
+    }
     .form-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -261,21 +443,10 @@
       gap: 12px;
       margin-top: 12px;
     }
-    .link{
-      background: transparent;
-      border: none;
-      color: var(--green2);
-      font-weight: 900;
-      font-size: 12px;
-      cursor:pointer;
-      padding: 0;
-    }
-    .link:disabled{ opacity:.5; cursor: default; }
-
-    textarea{
+textarea{
       min-height: 300px;
       resize: vertical;
-      margin-top: 6px;
+      margin-top: 0px;
       line-height: 1.35;
     }
     .muted{
@@ -366,6 +537,93 @@
     }
     .overlay.show{ display:flex; }
 
+
+    /* Bomb explosion FX layer (por encima del overlay) */
+    #bombFxLayer{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 65; /* overlay=50, confetti=60 */
+    }
+    .bomb-explosion{
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+    }
+    .bomb-explosion .flash{
+      position:absolute;
+      inset:-22px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,186,0,.85) 22%, rgba(239,68,68,.25) 55%, rgba(239,68,68,0) 72%);
+      animation: bombFlash .75s ease-out forwards;
+      filter: blur(.2px);
+    }
+    .bomb-explosion .ring{
+      position:absolute;
+      inset:-10px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,186,0,.9);
+      box-shadow: 0 0 30px rgba(255,120,0,.35);
+      animation: bombRing .75s ease-out forwards;
+    }
+    @keyframes bombFlash{
+      0%{ transform: scale(.35); opacity: 0; }
+      12%{ opacity: 1; }
+      60%{ transform: scale(1.65); opacity: .85; }
+      100%{ transform: scale(2.2); opacity: 0; }
+    }
+    @keyframes bombRing{
+      0%{ transform: scale(.55); opacity: .9; }
+      80%{ transform: scale(2.4); opacity: .25; }
+      100%{ transform: scale(2.9); opacity: 0; }
+    }
+    .boom-particle{
+      position:absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #f59e0b;
+      transform: translate(-50%, -50%);
+      opacity: 0.95;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,.22));
+      animation: boomParticle .9s ease-out forwards;
+    }
+    .boom-particle.is-spark{
+      width: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.9), rgba(245,158,11,.95), rgba(239,68,68,.0));
+      box-shadow: 0 0 16px rgba(245,158,11,.55);
+    }
+    @keyframes boomParticle{
+      0%{ transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100%{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.15); opacity: 0; }
+    }
+
+    /* Animación de explosión en la bomba (emoji) */
+    .timerbar-bomb.exploding .bomb-emoji{
+      animation: bombEmojiExplode .75s ease-out forwards;
+    }
+    @keyframes bombEmojiExplode{
+      0%{ transform: scale(var(--bombScale, 1)); opacity: 1; }
+      45%{ transform: scale(3.6); opacity: 1; }
+      100%{ transform: scale(.15); opacity: 0; }
+    }
+
+    /* Zoom-in 3s para el cuadro de grupos */
+    .winners-list.groups-zoom{
+      animation: groupsZoomIn 3s ease-out both;
+      transform-origin: 50% 10%;
+    }
+    @keyframes groupsZoomIn{
+      0%{ transform: scale(.55); opacity: 0; }
+      35%{ opacity: 1; }
+      70%{ transform: scale(1.03); }
+      100%{ transform: scale(1); }
+    }
+
     /* Confetti (canvas overlay) */
     #confettiCanvas{
       position: fixed;
@@ -379,12 +637,31 @@
     #confettiCanvas.active{ display:block; }
 
     .modal{
-      width: min(760px, 100%);
+      width: 70vw;
+      max-width: 70vw;
+      min-height: 70vh;
+      max-height: 82vh;
+      overflow: auto;
       background:#fff;
       border-radius: 16px;
       box-shadow: 0 30px 80px rgba(0,0,0,.28);
       border: 1px solid rgba(255,255,255,.25);
       padding: 14px;
+    }
+    @media (max-width: 720px){
+      .modal{
+        width: 92vw;
+        max-width: 92vw;
+        min-height: 70vh;
+        max-height: 88vh;
+      }
+    }
+    @media (max-width: 720px){
+      .modal{
+        width: 92vw;
+        max-width: 92vw;
+        max-height: 88vh;
+      }
     }
     .modal-head{
       display:flex;
@@ -597,14 +874,20 @@
       letter-spacing: .02em;
       margin-bottom: 8px;
       color: #111827;
-      text-transform: lowercase;
+      text-transform: none;
     }
     .group-members{
       display:flex;
       flex-wrap:wrap;
       gap: 6px;
     }
-    .member-pill{
+    
+    /* Nombres de grupos */
+    #groupNamesConfig{ margin-top: 10px; }
+    #groupNamesBox{ margin-top: 10px; }
+    #groupNamesInput{ width: 100%; min-height: 170px; font-size: 15px; }
+
+.member-pill{
       font-size: 12px;
       font-weight: 800;
       border-radius: 999px;
@@ -680,6 +963,15 @@
           </div>
         </div>
 
+        <div class="timerbar-wrap" id="timerBarWrap" aria-label="Tiempo restante" style="display:none;">
+                      <div class="timerbar-track">
+                        <div class="timerbar-bomb timerbar-bomb-fixed" id="timerBomb" aria-hidden="true"><span class="bomb-emoji">💣</span></div>
+                        <div class="timerbar-fill" id="timerBarFill" style="width:100%;">
+                          <div class="timerbar-sparks" id="timerSparks" aria-hidden="true"></div>
+                        </div>
+                      </div>
+                    </div>
+
         <section class="stage-card">
           <div class="stage-wrap" id="stage" aria-label="Escenario">
             <div class="stage-hint" id="stageHint">
@@ -692,7 +984,9 @@
 
             <div class="line"></div>
             <div class="line-label">Línea de selección</div>
-            <div class="tiles" id="tiles"></div>
+            
+            
+<div class="tiles" id="tiles"></div>
           </div>
         </section>
       </main>
@@ -718,8 +1012,11 @@
 
         <div class="form-grid">
           <div>
-            <label for="durationSeconds">Tiempo (segundos)</label>
-            <input id="durationSeconds" type="number" min="1" max="120" step="0.5" value="6">
+            <div class="range-head">
+              <label for="durationSeconds" style="margin:0;">Tiempo (segundos)</label>
+              <span class="range-badge" id="durationBadge">6 s</span>
+            </div>
+            <input id="durationSeconds" type="range" min="1" max="120" step="0.5" value="6" aria-label="Tiempo (segundos)">
           </div>
           <div>
             <label for="winnersCount">N° Ganadores</label>
@@ -727,13 +1024,17 @@
           </div>
           <div>
             <label for="intensity">Intensidad</label>
-            <input id="intensity" type="number" min="1" max="30" step="1" value="8">
+            <select id="intensity">
+              <option value="5">Baja</option>
+              <option value="8" selected>Normal</option>
+              <option value="12">Alta</option>
+            </select>
           </div>
           <div>
             <label for="tileSize">Tamaño Cuadro</label>
             <select id="tileSize">
-              <option value="normal" selected>Normal</option>
               <option value="small">Pequeño</option>
+              <option value="normal" selected>Estandar</option>
               <option value="large">Grande</option>
             </select>
           </div>
@@ -751,8 +1052,27 @@
                 </label>
                 <span class="mode-label" id="modeLabelGroups">Grupos</span>
               </div>
+            
+          </div>
+
+          <!-- Nombres de grupos (solo disponible en modo Grupos) -->
+          <div class="grid-span" id="groupNamesConfig" style="display:none;">
+            <div class="mode-switch" aria-label="Nombres de grupos">
+              <span class="mode-label active" id="groupNamesLabelOff">Sin nombres</span>
+              <label class="switch" title="Activar nombres de grupos">
+                <input id="groupNamesEnabled" type="checkbox" aria-label="Activar nombres de grupos">
+                <span class="slider"></span>
+              </label>
+              <span class="mode-label" id="groupNamesLabelOn">Nombres grupos</span>
+            </div>
+
+            <div id="groupNamesBox" style="display:none;">
+              <label for="groupNamesInput" style="margin-top:10px;">Nombres de grupos (uno por línea)</label>
+              <textarea id="groupNamesInput" placeholder="Equipo A&#10;Equipo B&#10;Equipo C"></textarea>
+              <div class="muted" style="margin-top:6px;">Cada línea crea un grupo y ajusta automáticamente “Cantidad de grupos”.</div>
             </div>
           </div>
+
           <div>
             <label for="groupsCount">Cantidad de grupos</label>
             <input id="groupsCount" type="number" min="1" max="1" step="1" value="2" disabled>
@@ -763,12 +1083,11 @@
           </div>
         </div>
 
-        <div class="label-row">
-          <label for="wordsInput" style="margin:0;">Participantes (Uno por línea)</label>
-          <button class="link" id="btnExample" type="button">Pegar Ejemplo</button>
+        <div class="grid-span participants-block">
+          <label for="wordsInput" class="label-caps">PARTICIPANTES (UNO POR LÍNEA)</label>
+          <textarea id="wordsInput" class="textarea-big" placeholder="Pegue nombres aquí..."></textarea>
+          <div class="muted">Consejo: si pega desde Excel, se unirá Nombre + Apellido por fila automáticamente.</div>
         </div>
-        <textarea id="wordsInput" placeholder="Pegue aquí..."></textarea>
-        <div class="muted">Consejo: si pega desde Excel, se unirá Nombre + Apellido por fila automáticamente.</div>
 
         <details class="advanced">
           <summary>Opciones</summary>
@@ -851,6 +1170,7 @@
     </div>
 
     <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+    <div id="bombFxLayer" aria-hidden="true"></div>
   </div>
 
 
@@ -861,7 +1181,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-
     "use strict";
 
     // ==========================
@@ -869,6 +1188,7 @@
     // ==========================
 
     const durationSeconds = document.getElementById("durationSeconds");
+    const durationBadge = document.getElementById("durationBadge");
     const winnersCount = document.getElementById("winnersCount");
     const intensity = document.getElementById("intensity");
     const tileSize = document.getElementById("tileSize");
@@ -879,6 +1199,15 @@
     const groupsPanel = document.getElementById("groupsPanel");
     const groupsGrid = document.getElementById("groupsGrid");
     const groupsEnabled = document.getElementById("groupsEnabled");
+
+    // Nombres de grupos
+    const groupNamesConfig = document.getElementById("groupNamesConfig");
+    const groupNamesEnabled = document.getElementById("groupNamesEnabled");
+    const groupNamesBox = document.getElementById("groupNamesBox");
+    const groupNamesInput = document.getElementById("groupNamesInput");
+    const groupNamesLabelOff = document.getElementById("groupNamesLabelOff");
+    const groupNamesLabelOn = document.getElementById("groupNamesLabelOn");
+
 
     // Switch labels (Ruleta / Grupos)
     const modeLabelRoulette = document.getElementById("modeLabelRoulette");
@@ -898,8 +1227,32 @@
     const btnProjectorExit = document.getElementById("btnProjectorExit");
 
     const wordsInput = document.getElementById("wordsInput");
-    const btnExample = document.getElementById("btnExample");
-    const btnReorder = document.getElementById("btnReorder");
+
+    // Ponderación oculta: convierte puntos al final de cada línea en marcadores invisibles.
+    // Así, el docente puede escribir "Juan.." y en la caja no se verá el punto, pero contará como mayor probabilidad.
+    function replaceTrailingDotsWithInvisibleMarkers(text){
+      const lines = String(text || "").split(/\r?\n/g);
+      return lines.map(line => {
+        const m = line.match(/(\.+)$/);
+        if (!m) return line;
+        const dots = m[1].length;
+        return line.replace(/\.+$/, "") + INV_MARK.repeat(dots);
+      }).join("\n");
+    }
+
+    wordsInput.addEventListener("input", () => {
+      const v = wordsInput.value;
+      const fixed = replaceTrailingDotsWithInvisibleMarkers(v);
+      if (fixed !== v) {
+        const s = wordsInput.selectionStart;
+        const e = wordsInput.selectionEnd;
+        wordsInput.value = fixed;
+        // Mantener el cursor (los marcadores invisibles cuentan como caracteres)
+        wordsInput.setSelectionRange(s, e);
+      }
+    });
+
+const btnReorder = document.getElementById("btnReorder");
     const btnStart = document.getElementById("btnStart");
     const btnStartLabel = document.getElementById("btnStartLabel");
     const stageHint = document.getElementById("stageHint");
@@ -907,6 +1260,10 @@
     const stage = document.getElementById("stage");
     const tilesEl = document.getElementById("tiles");
     const countdownEl = document.getElementById("countdown");
+    const timerBarWrap = document.getElementById("timerBarWrap");
+    const timerBarFill = document.getElementById("timerBarFill");
+    const timerBomb = document.getElementById("timerBomb");
+    const timerSparks = document.getElementById("timerSparks");
     const countParticipants = document.getElementById("countParticipants");
     const countWinnersBadge = document.getElementById("countWinnersBadge");
     const statusBadge = document.getElementById("statusBadge");
@@ -1045,6 +1402,7 @@
     // Estado
     // ==========================
     let participants = [];
+    let participantsEntries = [];
     let colorMap = new Map();
 
     let tiles = [];
@@ -1108,6 +1466,7 @@
 
     let runStart = 0;
     let runEnd = 0;
+    let runTotalMs = 0;
     let lastTs = 0;
 
     // ==========================
@@ -1116,6 +1475,261 @@
     function clamp(n, a, b) {
       return Math.min(b, Math.max(a, n));
     }
+
+    function formatSecondsLabel(v){
+      const n = Number(v);
+      if (!Number.isFinite(n)) return "—";
+      const roundedTenth = Math.round(n * 10);
+      const label = (roundedTenth % 10 === 0) ? String(Math.round(n)) : n.toFixed(1);
+      return label + " s";
+    }
+
+    function syncDurationBadge(){
+      if (!durationSeconds) return;
+      const v = clamp(parseFloat(durationSeconds.value) || 6, 1, 120);
+      durationSeconds.value = String(v);
+      if (durationBadge) durationBadge.textContent = formatSecondsLabel(v);
+    }
+
+
+    // ==========================
+    // Barra de tiempo (cuenta regresiva)
+    const BOMB_MIN_SCALE = 0.6;
+    const BOMB_MAX_SCALE = 3.0;
+    // ==========================
+    
+function resetTimerBar() {
+      if (!timerBarWrap || !timerBarFill) return;
+      timerBarWrap.style.display = "none";
+      timerBarFill.style.width = "100%";
+      timerBarFill.style.backgroundColor = "#22c55e";
+      if (timerBomb) {
+        timerBomb.classList.remove("danger");
+        timerBomb.style.setProperty("--bombScale", String(BOMB_MIN_SCALE));
+      }
+      stopSparkFX();
+    }
+
+    
+function showTimerBar() {
+      if (!timerBarWrap || !timerBarFill) return;
+      timerBarWrap.style.display = "block";
+      if (timerBomb) {
+        timerBomb.classList.remove("danger");
+        timerBomb.style.setProperty("--bombScale", String(BOMB_MIN_SCALE));
+      }
+    }
+
+
+    function finalizeTimerBarAtZero() {
+      if (!timerBarWrap || !timerBarFill) return;
+
+      // Mantener visible y terminar al 0% (extremo izquierdo)
+      timerBarWrap.style.display = "block";
+      timerBarFill.style.width = "0%";
+      timerBarFill.style.backgroundColor = "#ef4444";
+
+      // Dejar la bomba en peligro al finalizar
+      if (timerBomb) {
+        timerBomb.classList.add("danger");
+        timerBomb.style.setProperty("--bombScale", String(BOMB_MAX_SCALE));
+      }
+
+      // Ráfaga final de chispas (aleatorias)
+      try{
+        for (let i = 0; i < 14; i++) spawnSparkParticle({ intensityLevel: 3 });
+      }catch(_e){}
+
+      // Detener la emisión continua y limpiar después de un momento
+      setTimeout(() => { stopSparkFX(); }, 900);
+    }
+
+    
+function updateTimerBar(leftMs) {
+      if (!timerBarFill || !runTotalMs) return;
+
+      const pct = Math.max(0, Math.min(100, (leftMs / runTotalMs) * 100));
+      timerBarFill.style.width = pct.toFixed(3) + "%";
+
+      // Escala de la bomba: inicia pequeña y crece hasta x3 al llegar a 0
+      if (timerBomb) {
+        const t = 1 - (pct / 100); // 0..1
+        const scale = BOMB_MIN_SCALE + (BOMB_MAX_SCALE - BOMB_MIN_SCALE) * t;
+        timerBomb.style.setProperty("--bombScale", scale.toFixed(3));
+      }
+
+      // Zonas por % de tiempo restante: 0–33 rojo, 34–67 amarillo, >67 verde
+      let color = "#22c55e";
+      if (timerBomb) timerBomb.classList.remove("danger");
+
+      if (pct <= 33.333) {
+        color = "#ef4444";
+        if (timerBomb) timerBomb.classList.add("danger");
+      } else if (pct <= 67.666) {
+        color = "#facc15";
+      }
+
+      timerBarFill.style.backgroundColor = color;
+    }
+
+    
+    // ==========================
+    // Explosión de bomba (al llegar a 0)
+    // ==========================
+    let bombExplodedThisRun = false;
+    const bombFxLayer = document.getElementById("bombFxLayer");
+
+    function clearBombFX(){
+      if (!bombFxLayer) return;
+      bombFxLayer.innerHTML = "";
+    }
+
+    function triggerBombExplosion(){
+      if (bombExplodedThisRun) return;
+      bombExplodedThisRun = true;
+
+      if (!timerBomb) return;
+
+      // Animación del emoji
+      timerBomb.classList.add("exploding");
+
+      // FX por fuera (layer fijo por encima del overlay)
+      if (bombFxLayer) {
+        const r = timerBomb.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+
+        const boom = document.createElement("div");
+        boom.className = "bomb-explosion";
+        boom.style.left = cx + "px";
+        boom.style.top = cy + "px";
+        boom.innerHTML = '<div class="flash"></div><div class="ring"></div>';
+        bombFxLayer.appendChild(boom);
+
+        // Partículas (puntos + trazos)
+        const particleCount = 26;
+        for (let i = 0; i < particleCount; i++) {
+          const p = document.createElement("div");
+          p.className = "boom-particle" + (Math.random() < 0.45 ? " is-spark" : "");
+          const ang = Math.random() * Math.PI * 2;
+          const dist = 40 + Math.random() * 120;
+          const dx = Math.cos(ang) * dist;
+          const dy = Math.sin(ang) * dist - (10 + Math.random() * 40);
+          p.style.left = cx + "px";
+          p.style.top = cy + "px";
+          p.style.setProperty("--dx", dx.toFixed(1) + "px");
+          p.style.setProperty("--dy", dy.toFixed(1) + "px");
+
+          // color variado tipo fuego
+          const colors = ["#f59e0b", "#ef4444", "#f97316", "#fde047", "#ffffff"];
+          p.style.background = colors[Math.floor(Math.random() * colors.length)];
+          bombFxLayer.appendChild(p);
+        }
+
+        setTimeout(() => {
+          boom.remove();
+          // limpiar partículas
+          [...bombFxLayer.querySelectorAll(".boom-particle")].forEach(el => el.remove());
+        }, 950);
+      }
+
+      // Al terminar, devolver opacidad (para el siguiente run)
+      setTimeout(() => {
+        if (!timerBomb) return;
+        timerBomb.classList.remove("exploding");
+        // regresar a tamaño mínimo (se recalculará al iniciar de nuevo)
+        timerBomb.style.setProperty("--bombScale", String(BOMB_MIN_SCALE.toFixed(3)));
+      }, 900);
+    }
+
+// ==========================
+    // Chispas (aleatorias) en el extremo de la barra
+    // ==========================
+    let sparkIntervalId = null;
+
+    function clearTimerSparks(){
+      if (!timerSparks) return;
+      timerSparks.innerHTML = "";
+    }
+
+    function stopSparkFX(){
+      if (sparkIntervalId) {
+        clearInterval(sparkIntervalId);
+        sparkIntervalId = null;
+      }
+      clearTimerSparks();
+    }
+
+    function spawnSparkParticle({ intensityLevel = 2 } = {}){
+      if (!timerSparks) return;
+
+      const el = document.createElement("span");
+      const isStreak = Math.random() < 0.42;
+
+      el.className = "spark" + (isStreak ? " streak" : "");
+
+      // Intensidad sube cuando el tiempo está en rojo
+      const sizeBase = isStreak ? rand(2, 4) : rand(4, 9);
+      const size = sizeBase + intensityLevel * rand(0.5, 1.4);
+
+      const w = isStreak ? rand(2, 4) : size;
+      const h = isStreak ? rand(16, 34) + intensityLevel * rand(6, 12) : size;
+
+      // Origen (sale por fuera de la barra)
+      const x0 = rand(-6, 6);
+      const y0 = rand(-18, -46);
+
+      // Trayectoria (aleatoria)
+      const dx = rand(-36, 36) * (0.9 + intensityLevel * 0.15);
+      const dy = rand(-55, -130) * (0.9 + intensityLevel * 0.18);
+
+      const rot = rand(-160, 160);
+      const s = rand(0.12, 0.45);
+      const dur = rand(420, 980) / (0.92 + intensityLevel * 0.08);
+
+      el.style.setProperty("--w", w.toFixed(1) + "px");
+      el.style.setProperty("--h", h.toFixed(1) + "px");
+      el.style.setProperty("--x0", x0.toFixed(1) + "px");
+      el.style.setProperty("--y0", y0.toFixed(1) + "px");
+      el.style.setProperty("--dx", dx.toFixed(1) + "px");
+      el.style.setProperty("--dy", dy.toFixed(1) + "px");
+      el.style.setProperty("--rot", rot.toFixed(1) + "deg");
+      el.style.setProperty("--s", String(s));
+      el.style.setProperty("--dur", dur.toFixed(0) + "ms");
+
+      timerSparks.appendChild(el);
+
+      // Limpieza
+      setTimeout(() => el.remove(), Math.ceil(dur + 80));
+    }
+
+    function startSparkFX(){
+      if (!timerSparks) return;
+
+      stopSparkFX();
+
+      sparkIntervalId = setInterval(() => {
+        if (!isRunning) return;
+
+        const left = Math.max(0, runEnd - performance.now());
+        const pct = runTotalMs ? (left / runTotalMs) * 100 : 100;
+
+        // 0–33 rojo (más chispas), 34–67 amarillo, >67 verde
+        let intensityLevel = 1; // verde
+        if (pct <= 33.333) intensityLevel = 3;     // rojo
+        else if (pct <= 67.666) intensityLevel = 2; // amarillo
+
+        // Cantidad por "tick" (aleatorio)
+        const base = intensityLevel === 3 ? 4 : (intensityLevel === 2 ? 3 : 2);
+        const count = base + (Math.random() < 0.35 ? 1 : 0);
+
+        for (let i = 0; i < count; i++) {
+          spawnSparkParticle({ intensityLevel });
+        }
+      }, 110);
+    }
+
+
 
     function rand(min, max) {
       return min + Math.random() * (max - min);
@@ -1159,23 +1773,130 @@
     }
 
     function parseParticipants(raw) {
-      const lines = String(raw || "")
-        .split(/\r?\n/g)
-        .map(s => s.trim())
-        .filter(Boolean);
+  const lines = String(raw || "")
+    .split(/\r?\n/g)
+    .map(s => s.trim())
+    .filter(Boolean);
 
-      return lines.map(line => {
-        // Si viene desde Excel: columnas separadas por TAB. Unimos columnas.
-        if (line.includes("\t")) {
-          const cols = line.split("\t").map(c => c.trim()).filter(Boolean);
-          return cols.join(" ").replace(/\s+/g, " ");
-        }
-        return line.replace(/\s+/g, " ");
-      });
+  return lines.map(line => {
+    // Si viene desde Excel: columnas separadas por TAB. Unimos columnas.
+    if (line.includes("\t")) {
+      const cols = line.split("\t").map(c => c.trim()).filter(Boolean);
+      line = cols.join(" ").replace(/\s+/g, " ");
+    } else {
+      line = line.replace(/\s+/g, " ");
     }
 
-    
-    function normKey(s) {
+    // Marcadores ocultos: puntos al final (.) o separadores invisibles (\u2063)
+    // NO deben afectar el nombre visible.
+    return line.replace(/(\.+|\u2063+)$/g, "").trim();
+  });
+}
+
+
+
+// ==========================
+// Ponderación oculta (modo docente)
+// Marcador invisible: si el docente escribe puntos al final de una línea,
+// se convierten a caracteres invisibles dentro del textarea y se usan como "peso".
+// Ejemplo (en la caja, el punto desaparece):
+//   "Juan"   -> peso 1
+//   "Juan."  -> peso 2
+//   "Juan.." -> peso 3
+// Nota: los marcadores NO se muestran en tiles/ganadores/grupos.
+// ==========================
+const INV_MARK = "⁣"; // Invisible Separator
+const WEIGHT_MAX = 6;
+
+function parseParticipantsWeighted(raw) {
+  const lines = String(raw || "")
+    .split(/\r?\n/g)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const out = [];
+  for (let line of lines) {
+    // Si viene desde Excel: columnas separadas por TAB. Unimos columnas.
+    if (line.includes("\t")) {
+      const cols = line.split("\t").map(c => c.trim()).filter(Boolean);
+      line = cols.join(" ").replace(/\s+/g, " ");
+    } else {
+      line = line.replace(/\s+/g, " ");
+    }
+
+    // 1) Marcadores invisibles al final (cada marca = +1 marcador)
+    const invMatch = line.match(/(\u2063+)$/);
+    const invCount = invMatch ? invMatch[1].length : 0;
+    if (invCount) line = line.replace(/(\u2063+)$/g, "");
+
+    // 2) Compatibilidad: puntos visibles al final (si alguien logra pegarlos tal cual)
+    const dotMatch = line.match(/(\.+)$/);
+    const dotCount = dotMatch ? dotMatch[1].length : 0;
+
+    const name = line.replace(/\.+$/g, "").trim();
+    if (!name) continue;
+
+    // markerCount = cantidad de "puntos" (visibles o invisibles) al final
+    const markerCount = clamp(invCount + dotCount, 0, WEIGHT_MAX - 1);
+    const weight = clamp(1 + markerCount, 1, WEIGHT_MAX);
+
+    // Regla docente:
+    // - 0 o 1 marcador: solo aumenta probabilidad.
+    // - 2+ marcadores (".."): gana con 100% de probabilidad (se fuerza en pickWinners).
+    const force = markerCount >= 2;
+
+    out.push({
+      name,
+      weight,
+      markerCount,
+      force,
+      // Guardamos el marcador como invisible (no puntos) para que no se note en el textarea.
+      rawLine: name + INV_MARK.repeat(markerCount)
+    });
+  }
+  return out;
+}
+
+function dedupeEntriesByName(entries) {
+  const map = new Map();
+  const removed = [];
+  for (const e of entries) {
+    const key = normKey(e.name);
+    if (!map.has(key)) {
+      map.set(key, { ...e });
+    } else {
+      const cur = map.get(key);
+      // Combinar marcadores: usar el mayor (más predecible)
+      cur.markerCount = Math.max(cur.markerCount || 0, e.markerCount || 0);
+      cur.weight = clamp(1 + (cur.markerCount || 0), 1, WEIGHT_MAX);
+      cur.force = (cur.markerCount || 0) >= 2;
+      cur.rawLine = cur.name + INV_MARK.repeat(cur.markerCount || 0);
+      removed.push(e.name);
+    }
+  }
+  return { entries: [...map.values()], removed };
+}
+
+function applyOrderingEntries(mode, entries) {
+  if (mode === "shuffle") return shuffle(entries);
+  if (mode === "az") return [...entries].sort((a,b) => a.name.localeCompare(b.name, "es"));
+  if (mode === "za") return [...entries].sort((a,b) => b.name.localeCompare(a.name, "es"));
+  return [...entries];
+}
+
+function pickWeightedName(entries) {
+  if (!entries || entries.length === 0) return null;
+  let total = 0;
+  for (const e of entries) total += (e.weight || 1);
+  let r = Math.random() * total;
+  for (const e of entries) {
+    r -= (e.weight || 1);
+    if (r < 0) return e.name;
+  }
+  return entries[entries.length - 1].name;
+}
+
+function normKey(s) {
       return String(s || "")
         .trim()
         .toLowerCase()
@@ -1265,7 +1986,49 @@
       return groups;
     }
 
-    function renderGroups(groups) {
+    function parseGroupNames(raw) {
+      return String(raw || "")
+        .split(/\r?\n/g)
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
+    function isGroupNamesMode() {
+      return isGroupsMode() && !!(groupNamesEnabled && groupNamesEnabled.checked);
+    }
+
+    function syncGroupNamesUI(listLen) {
+      const groupsMode = isGroupsMode();
+
+      // Mostrar/ocultar bloque completo: solo visible en modo Grupos
+      if (groupNamesConfig) {
+        groupNamesConfig.style.display = groupsMode ? "block" : "none";
+      }
+
+      if (!groupsMode) {
+        if (groupNamesBox) groupNamesBox.style.display = "none";
+        return;
+      }
+
+      const namesMode = isGroupNamesMode();
+
+      if (groupNamesBox) groupNamesBox.style.display = namesMode ? "block" : "none";
+
+      if (groupNamesLabelOff && groupNamesLabelOn) {
+        groupNamesLabelOff.classList.toggle("active", !namesMode);
+        groupNamesLabelOn.classList.toggle("active", namesMode);
+      }
+
+      // Si está activo, la cantidad de grupos se toma del número de líneas (nombres) y se clampa por el máximo
+      if (namesMode && groupsCount) {
+        const maxG = maxGroupsFor(listLen);
+        const names = parseGroupNames(groupNamesInput ? groupNamesInput.value : "");
+        const k = clamp(Math.max(1, names.length), 1, maxG);
+        groupsCount.value = String(k);
+      }
+    }
+
+    function renderGroups(groups, groupNames = null) {
       // Mostrar grupos en el mismo panel que ganadores (overlay)
       stopConfetti();
 
@@ -1284,7 +2047,7 @@
 
         const title = document.createElement("div");
         title.className = "group-title";
-        title.textContent = `grupo ${idx + 1}`;
+        title.textContent = (Array.isArray(groupNames) && groupNames[idx]) ? groupNames[idx] : `Grupo ${idx + 1}`;
 
         const membersEl = document.createElement("div");
         membersEl.className = "group-members";
@@ -1302,7 +2065,14 @@
       });
 
       winnerOverlay.dataset.mode = "groups";
-      winnerOverlay.classList.add("show");
+      
+      // Animación (zoom-in 3s) + confeti al finalizar en modo grupos
+      winnersList.classList.remove("groups-zoom");
+      void winnersList.offsetWidth; // reiniciar animación
+      winnersList.classList.add("groups-zoom");
+      launchConfetti({ durationMs: 3200, count: 220 });
+
+winnerOverlay.classList.add("show");
       winnerOverlay.setAttribute("aria-hidden", "false");
 
       // Mantener panel lateral oculto (para evitar duplicación)
@@ -1312,6 +2082,9 @@
 
     function generateGroups({ auto = false } = {}) {
       const list = getListForGroups();
+
+      // UI sincronizada (máximos y nombres)
+      syncGroupNamesUI(list.length);
       syncGroupsConstraints(list.length);
 
       if (!hasResult || isRunning || list.length < 2) {
@@ -1322,11 +2095,33 @@
       }
 
       const maxG = maxGroupsFor(list.length);
-      const k = clamp(parseInt(groupsCount.value, 10) || 2, 1, maxG);
+
+      let groupNames = null;
+      let k = 2;
+
+      if (isGroupNamesMode()) {
+        const names = parseGroupNames(groupNamesInput ? groupNamesInput.value : "");
+        if (names.length === 0) {
+          if (!auto) {
+            resultText.textContent = "Resultado: escriba al menos 1 nombre de grupo (uno por línea).";
+          }
+          return null;
+        }
+
+        k = clamp(names.length, 1, maxG);
+        groupNames = names.slice(0, k);
+
+        if (!auto && names.length > maxG) {
+          resultText.textContent = `Resultado: hay ${names.length} nombres, pero el máximo permitido es ${maxG}. Se usarán los primeros ${k}.`;
+        }
+      } else {
+        k = clamp(parseInt(groupsCount.value, 10) || 2, 1, maxG);
+      }
+
       groupsCount.value = String(k);
 
       const groups = buildGroupsRoundRobin(list, k);
-      renderGroups(groups);
+      renderGroups(groups, groupNames);
       return groups;
     }
 
@@ -1366,11 +2161,15 @@
 
       // Modo grupos
       if (groupsEnabled) groupsEnabled.disabled = disabled;
-      if (groupsCount) groupsCount.disabled = disabled || !groupsMode;
+      if (groupsCount) groupsCount.disabled = disabled || !groupsMode || isGroupNamesMode();
+      if (groupNamesEnabled) groupNamesEnabled.disabled = disabled || !groupsMode;
+      if (groupNamesInput) groupNamesInput.disabled = disabled || !groupsMode || !isGroupNamesMode();
 
       if (btnGroups) {
         const list = getListForGroups();
-        btnGroups.disabled = disabled || !groupsMode || !hasResult || (list.length < 2);
+        const namesMode = isGroupNamesMode();
+        const namesOk = !namesMode || (parseGroupNames(groupNamesInput ? groupNamesInput.value : "").length > 0);
+        btnGroups.disabled = disabled || !groupsMode || !hasResult || (list.length < 2) || (!namesOk);
       }
     }
 
@@ -1383,31 +2182,44 @@
     // Creación / reordenamiento
     // ==========================
     function applyList({ reorderNow = false } = {}) {
-      let list = parseParticipants(wordsInput.value);
-      if (dedupeToggle && dedupeToggle.checked) {
-        list = dedupeList(list).list;
-      }
-      if (list.length === 0) {
-        participants = [];
-        colorMap = new Map();
-        updateCounts();
-        clearTiles();
-        hideGroups();
-        resultText.textContent = "Resultado: —";
-        return;
-      }
+  // Importante:
+  // - Internamente usamos nombres limpios (sin puntos) y pesos (puntos al final) para ponderación.
+  // - Solo reescribimos el textarea cuando el usuario presiona "Reordenar" (para no perder marcadores).
+  let entries = parseParticipantsWeighted(wordsInput.value);
 
-      const mode = reorderNow ? ordering.value : ordering.value;
-      participants = applyOrdering(mode, list);
-      colorMap = rebuildColorMap(participants);
+  if (dedupeToggle && dedupeToggle.checked) {
+    const r = dedupeEntriesByName(entries);
+    entries = r.entries;
+  }
 
-      wordsInput.value = participants.join("\n");
-      updateCounts();
-      clearTiles();
-      resultText.textContent = "Resultado: —";
-    }
+  if (entries.length === 0) {
+    participants = [];
+    participantsEntries = [];
+    colorMap = new Map();
+    updateCounts();
+    clearTiles();
+    hideGroups();
+    resultText.textContent = "Resultado: —";
+    return;
+  }
 
-    // ==========================
+  const mode = ordering.value;
+
+  participantsEntries = applyOrderingEntries(mode, entries);
+  participants = participantsEntries.map(e => e.name);
+
+  colorMap = rebuildColorMap(participants);
+
+  if (reorderNow) {
+    wordsInput.value = participantsEntries.map(e => e.rawLine).join("\n");
+  }
+
+  updateCounts();
+  clearTiles();
+  resultText.textContent = "Resultado: —";
+}
+
+// ==========================
     // Tiles
     // ==========================
     function spawnTile(name) {
@@ -1465,8 +2277,8 @@
             const old = tiles.shift();
             if (old && old.el) old.el.remove();
           }
-          const name = participants[Math.floor(Math.random() * participants.length)];
-          spawnTile(name);
+          const name = pickWeightedName(participantsEntries) || participants[Math.floor(Math.random() * participants.length)];
+          if (name) spawnTile(name);
         }
 
         const jitter = rand(-0.35, 0.45) * baseInterval;
@@ -1481,6 +2293,12 @@
     // ==========================
     function pickWinners(n) {
       const want = clamp(n, 1, participants.length || 1);
+
+      // Regla 100% (docente): si un nombre tiene 2+ marcadores (..),
+      // debe aparecer SIEMPRE en la selección, incluso si hay varios ganadores.
+      const forcedEntries = (participantsEntries || []).filter(e => e && e.force);
+      const forcedSet = new Set(forcedEntries.map(e => e.name));
+
       const lineY = getLineY();
       const stageRect = stage.getBoundingClientRect();
 
@@ -1510,6 +2328,26 @@
       const winners = [];
       const used = new Set();
 
+      // 1) Si hay "forzados", agregarlos primero (por cercanía real si existen en pantalla).
+      if (forcedSet.size) {
+        for (const item of ranked) {
+          if (forcedSet.has(item.name) && !used.has(item.name)) {
+            winners.push(item.name);
+            used.add(item.name);
+            if (winners.length >= want) return winners;
+          }
+        }
+        // Si algún forzado no alcanzó a estar en pantalla, igual se incluye.
+        for (const e of forcedEntries) {
+          if (!used.has(e.name)) {
+            winners.push(e.name);
+            used.add(e.name);
+            if (winners.length >= want) return winners;
+          }
+        }
+      }
+
+      // 2) Completar el resto con la lógica normal (sin repetir nombres)
       for (const item of ranked) {
         if (!used.has(item.name)) {
           winners.push(item.name);
@@ -1604,26 +2442,32 @@
     function applyModeUI() {
       const groupsMode = isGroupsMode();
 
+      // Mantener UI de nombres y límites en sync
+      const list = getListForGroups();
+      syncGroupNamesUI(list.length);
+      syncGroupsConstraints(list.length);
+
       // Modo ganador / grupos: exclusión
       winnersCount.disabled = groupsMode || isRunning;
       removeWinner.disabled = groupsMode || isRunning;
 
-      if (groupsCount) groupsCount.disabled = (!groupsMode) || isRunning;
+      if (groupsCount) groupsCount.disabled = (!groupsMode) || isRunning || isGroupNamesMode();
 
       // Botón generar grupos: solo en modo grupos, y después del primer sorteo con resultado
       if (btnGroups) {
-        const list = getListForGroups();
-        btnGroups.disabled = (!groupsMode) || (!hasResult) || isRunning || (list.length < 2);
+        const namesMode = isGroupNamesMode();
+        const namesOk = !namesMode || (parseGroupNames(groupNamesInput ? groupNamesInput.value : "").length > 0);
+        btnGroups.disabled = (!groupsMode) || (!hasResult) || isRunning || (list.length < 2) || (!namesOk);
       }
 
       // Badge ganadores
       const wc = clamp(parseInt(winnersCount.value, 10) || 1, 1, 50);
       countWinnersBadge.textContent = groupsMode ? "—" : String(wc);
-    
+
       syncModeLabels();
     }
 
-    
+
     function escapeHtml(str){
       return String(str || "")
         .replaceAll("&","&amp;")
@@ -1780,10 +2624,10 @@
     // ==========================
     // Ejecución
     // ==========================
-    function stopRunPick() {
+    function stopRunPick(autoEnd = false) {
       isRunning = false;
       hasResult = true;
-
+      if (autoEnd) { finalizeTimerBarAtZero(); triggerBombExplosion(); } else { resetTimerBar(); }
       if (rafId) cancelAnimationFrame(rafId);
       rafId = null;
       if (spawnTimeoutId) clearTimeout(spawnTimeoutId);
@@ -1818,19 +2662,21 @@
         // Eliminar ganadores si se pidió
         if (removeWinner.value === "remove" && participants.length) {
           const toRemove = new Set(winners);
-          participants = participants.filter(p => !toRemove.has(p));
-          colorMap = rebuildColorMap(participants);
-          wordsInput.value = participants.join("\n");
-          updateCounts();
-        }
+          
+participantsEntries = participantsEntries.filter(e => !toRemove.has(e.name));
+participants = participantsEntries.map(e => e.name);
+colorMap = rebuildColorMap(participants);
+wordsInput.value = participantsEntries.map(e => e.rawLine).join("\n");
+updateCounts();
+}
       }
 
       updateLiveState();
     }
 
-    function stopRunOnly() {
+    function stopRunOnly(autoEnd = false) {
       isRunning = false;
-
+      if (autoEnd) { finalizeTimerBarAtZero(); triggerBombExplosion(); } else { resetTimerBar(); }
       if (rafId) cancelAnimationFrame(rafId);
       rafId = null;
       if (spawnTimeoutId) clearTimeout(spawnTimeoutId);
@@ -1904,7 +2750,9 @@ function frame(ts) {
       const left = Math.max(0, runEnd - ts);
       countdownEl.textContent = formatMs(left);
 
-      const stageW = stage.clientWidth;
+      
+      updateTimerBar(left);
+const stageW = stage.clientWidth;
       const stageH = stage.clientHeight;
 
       for (let i = tiles.length - 1; i >= 0; i--) {
@@ -1954,7 +2802,7 @@ function frame(ts) {
 
       if (left <= 0) {
         countdownEl.textContent = "00:00.0";
-        stopRunPick();
+        stopRunPick(true);
         return;
       }
 
@@ -1988,7 +2836,12 @@ function frame(ts) {
 
       const durationMs = clamp(parseFloat(durationSeconds.value) || 6, 1, 120) * 1000;
 
+      
+      runTotalMs = durationMs;
+      showTimerBar();
+      updateTimerBar(durationMs);
       isRunning = true;
+      startSparkFX();
       playTick();
       if (stageHint) stageHint.style.display = "none";
       setStartButton(true);
@@ -2008,7 +2861,11 @@ function frame(ts) {
     }
 
     function resetAll() {
+      bombExplodedThisRun = false;
+      clearBombFX();
+
       isRunning = false;
+      resetTimerBar();
       if (rafId) cancelAnimationFrame(rafId);
       rafId = null;
       if (spawnTimeoutId) clearTimeout(spawnTimeoutId);
@@ -2032,23 +2889,7 @@ function frame(ts) {
     // ==========================
     // Eventos
     // ==========================
-
-    if (btnExample) {
-      btnExample.addEventListener("click", () => {
-        if (isRunning) return;
-        wordsInput.value = [
-          "Juan Pérez",
-          "María Gómez",
-          "Carlos Ruiz",
-          "Ana Torres",
-          "Luis Martínez",
-          "Sofía Herrera"
-        ].join("\n");
-        updateLiveState();
-      });
-    }
-
-    btnReorder.addEventListener("click", () => {
+btnReorder.addEventListener("click", () => {
       if (isRunning) return;
       applyList({ reorderNow: true });
       updateLiveState();
@@ -2074,12 +2915,44 @@ function frame(ts) {
       updateLiveState();
     });
 
+    if (durationSeconds) {
+      // Tiempo: etiqueta en vivo
+      syncDurationBadge();
+      durationSeconds.addEventListener("input", () => {
+        if (isRunning) return;
+        syncDurationBadge();
+      });
+      durationSeconds.addEventListener("change", () => {
+        if (isRunning) return;
+        syncDurationBadge();
+      });
+    }
+
+
     if (groupsCount) {
       groupsCount.addEventListener("input", () => {
         const list = getListForGroups();
         syncGroupsConstraints(list.length);
         updateLiveState();
       });
+    }
+
+    // Nombres de grupos
+    if (groupNamesEnabled) {
+      groupNamesEnabled.addEventListener("change", () => {
+        if (isRunning) return;
+        hideGroups();
+        applyModeUI();
+        updateLiveState();
+      });
+    }
+
+    if (groupNamesInput) {
+      groupNamesInput.addEventListener("input", () => {
+        if (isRunning) return;
+        updateLiveState();
+      });
+      groupNamesInput.addEventListener("paste", () => setTimeout(updateLiveState, 0));
     }
 
     if (btnGroups) {
@@ -2122,9 +2995,12 @@ function frame(ts) {
       countParticipants.textContent = String(list.length);
 
       // Grupos: máximo permitido = ⌊N/2⌋
+      syncGroupNamesUI(list.length);
       syncGroupsConstraints(list.length);
       if (btnGroups) {
-        btnGroups.disabled = (!groupsEnabled || !groupsEnabled.checked) || (!hasResult) || isRunning || (list.length < 2);
+        const namesMode = isGroupNamesMode();
+        const namesOk = !namesMode || (parseGroupNames(groupNamesInput ? groupNamesInput.value : "").length > 0);
+        btnGroups.disabled = (!groupsEnabled || !groupsEnabled.checked) || (!hasResult) || isRunning || (list.length < 2) || (!namesOk);
       }
 
       if (stageHint) {
@@ -2156,9 +3032,11 @@ function frame(ts) {
 
     // Inicial
     applyModeUI();
+    syncDurationBadge();
       updateLiveState();
   
-  </script>
+  
+</script>
   <div id="printArea" class="print-area" aria-hidden="true"></div>
 </body>
 </html>
