@@ -1042,7 +1042,14 @@ textarea{
           <!-- Grupos (mutuamente excluyente con ganadores) -->
           <div class="grid-span">
             <div class="section-title">Grupos</div>
-            <div class="muted" style="margin:4px 0 0;">Asignación equilibrada (round-robin). Máximo: ⌊Participantes/2⌋.</div>
+            <div class="muted" style="margin:4px 0 0;">Asignación equilibrada (round-robin). Máximo: ⌊Participantes/2⌋.
+<div class="checkline" style="margin-top:10px;">
+  <input id="unlimitedGroups" type="checkbox" aria-label="Permitir grupos sin límite de mitad">
+  <span>Modo individual (sin límite mitad)</span>
+</div>
+<div class="muted" id="unlimitedGroupsHint" style="margin-top:6px;">
+  Desactivado: máximo ⌊Participantes/2⌋. Activado: permite hasta Participantes (1 por persona).
+</div></div>
             <div style="margin-top:8px;">
               <div class="mode-switch" aria-label="Modo">
                 <span class="mode-label active" id="modeLabelRoulette">Ruleta</span>
@@ -3038,5 +3045,40 @@ btnReorder.addEventListener("click", () => {
   
 </script>
   <div id="printArea" class="print-area" aria-hidden="true"></div>
+<script>
+  // ===== OVERRIDE LÍMITE DE GRUPOS (MITAD) CON SWITCH =====
+  // Desactivado: máximo = floor(participantes/2)
+  // Activado: máximo = participantes (permite modo individual 1:1)
+  (function(){
+    function getUnlimitedFlag(){
+      const el = document.getElementById("unlimitedGroups");
+      return !!(el && el.checked);
+    }
+
+    window.maxGroupsFor = function(n){
+      const nn = (n || 0);
+      if (getUnlimitedFlag()) return Math.max(1, nn);
+      return Math.max(1, Math.floor(nn / 2));
+    };
+
+    try{ maxGroupsFor = window.maxGroupsFor; }catch(e){}
+
+    function refreshGroupsConstraints(){
+      try{
+        const list = (typeof getListForGroups === "function") ? getListForGroups() : [];
+        if (typeof syncGroupsConstraints === "function") syncGroupsConstraints(list.length);
+        if (typeof syncGroupNamesUI === "function") syncGroupNamesUI(list.length);
+      }catch(e){}
+    }
+
+    document.addEventListener("change", function(ev){
+      if(ev && ev.target && ev.target.id === "unlimitedGroups"){
+        refreshGroupsConstraints();
+      }
+    });
+
+    setTimeout(refreshGroupsConstraints, 80);
+  })();
+</script>
 </body>
 </html>
