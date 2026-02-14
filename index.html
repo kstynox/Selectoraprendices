@@ -917,6 +917,8 @@ textarea{
     .print-area{ display:none; }
 
     @media print{
+      *{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
       body{ background:#fff !important; }
       body *{ visibility:hidden !important; }
       #printArea, #printArea *{ visibility:visible !important; }
@@ -1076,6 +1078,7 @@ textarea{
             <div id="groupNamesBox" style="display:none;">
               <label for="groupNamesInput" style="margin-top:10px;">Nombres de grupos (uno por línea)</label>
               <textarea id="groupNamesInput" placeholder="Equipo A&#10;Equipo B&#10;Equipo C"></textarea>
+              <button class="btn inline" id="btnShuffleGroupNames" type="button" aria-label="Mezclar nombres de grupos" style="margin-top:10px;">Mezclar nombres</button>
               <div class="muted" style="margin-top:6px;">Cada línea crea un grupo y ajusta automáticamente “Cantidad de grupos”.</div>
             </div>
           </div>
@@ -1212,6 +1215,7 @@ textarea{
     const groupNamesEnabled = document.getElementById("groupNamesEnabled");
     const groupNamesBox = document.getElementById("groupNamesBox");
     const groupNamesInput = document.getElementById("groupNamesInput");
+    const btnShuffleGroupNames = document.getElementById("btnShuffleGroupNames");
     const groupNamesLabelOff = document.getElementById("groupNamesLabelOff");
     const groupNamesLabelOn = document.getElementById("groupNamesLabelOn");
 
@@ -1258,6 +1262,28 @@ textarea{
         wordsInput.setSelectionRange(s, e);
       }
     });
+
+
+    // Mezclar nombres de grupos (uno por línea)
+    function shuffleLinesPreservingEmpties(raw){
+      const lines = String(raw || "").split(/\r?\n/g);
+      const kept = lines.map(l => l.trim()).filter(l => l.length > 0);
+      for (let i = kept.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [kept[i], kept[j]] = [kept[j], kept[i]];
+      }
+      return kept.join("\n");
+    }
+
+    if (btnShuffleGroupNames && groupNamesInput) {
+      btnShuffleGroupNames.addEventListener("click", () => {
+        const mixed = shuffleLinesPreservingEmpties(groupNamesInput.value);
+        groupNamesInput.value = mixed;
+        groupNamesInput.dispatchEvent(new Event("input", { bubbles: true }));
+        groupNamesInput.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    }
+
 
 const btnReorder = document.getElementById("btnReorder");
     const btnStart = document.getElementById("btnStart");
@@ -2497,133 +2523,99 @@ winnerOverlay.classList.add("show");
       return `resultado_${base}_${y}${m}${d}_${hh}${mm}${ss}.pdf`;
     }
 
-    async function exportOverlayToPDF() {
-      // Exportación real a PDF (descarga directa). Si no hay librerías, usa impresión como respaldo.
-      if (winnerOverlay.getAttribute("aria-hidden") === "true") return;
 
-      const hasLibs = (typeof window.html2canvas === "function") && (window.jspdf && window.jspdf.jsPDF);
-      if (!hasLibs) {
-        // Respaldo: impresión del navegador (Guardar como PDF)
-        if (!printArea) { window.print(); return; }
+async function exportOverlayToPDF() {
+  // Exportación a PDF en texto (sin colores / sin imágenes)
+  if (winnerOverlay.getAttribute("aria-hidden") === "true") return;
 
-        const now = new Date();
-        const stamp = now.toLocaleString("es-CO");
-        const title = overlayTitle ? overlayTitle.textContent : "Resultado";
-        const mode = winnerOverlay.dataset.mode || "winners";
+  const hasPDF = (window.jspdf && window.jspdf.jsPDF);
+  if (!hasPDF) { window.print(); return; }
 
-        const bigVisible = (winnerBig && winnerBig.style.display !== "none" && (winnerBig.textContent || "").trim() !== "—");
-        const listHTML = winnersList ? winnersList.innerHTML : "";
+  const btn = document.getElementById("btnExportPDF");
+  const prevText = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "Generando..."; }
 
-        printArea.innerHTML = `
-          <div class="print-title">${escapeHtml(title)}</div>
-          <div class="print-meta">${escapeHtml(stamp)} · modo: ${mode === "groups" ? "grupos" : "ganadores"}</div>
-          ${bigVisible ? `<div class="winner-big" style="display:block;">${escapeHtml(winnerBig.textContent)}</div>` : ""}
-          <div class="winners-list">${listHTML}</div>
-        `;
-        printArea.setAttribute("aria-hidden", "false");
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-        const cleanup = () => {
-          if (!printArea) return;
-          printArea.innerHTML = "";
-          printArea.setAttribute("aria-hidden", "true");
-          window.removeEventListener("afterprint", cleanup);
-        };
-        window.addEventListener("afterprint", cleanup, { once: true });
-        setTimeout(() => window.print(), 50);
-        return;
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const marginX = 14;
+    const topY = 18;
+    const lineH = 6;
+
+    let y = topY;
+
+    // Título
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(16);
+    const titleText = (overlayTitle && overlayTitle.textContent) ? overlayTitle.textContent : "Resultados";
+    pdf.text(titleText, marginX, y);
+    y += 10;
+
+    // Contenido del overlay
+    const listEl = document.getElementById("winnersList");
+    if (!listEl) throw new Error("No se encontró el contenido para exportar.");
+
+    const groupCards = Array.from(listEl.querySelectorAll(".group-card"));
+
+    pdf.setFontSize(11);
+
+    const ensureSpace = (needed = lineH) => {
+      if (y + needed > pageH - 12) {
+        pdf.addPage();
+        y = topY;
       }
+    };
 
-      const btn = btnExportPDF;
-      const prevText = btn ? btn.textContent : "";
-      if (btn) { btn.disabled = true; btn.textContent = "Generando..."; }
-
-      // Clonar el contenido del modal (como quedó) y preparar un "lienzo" fuera de pantalla para capturarlo completo
-      const modal = winnerOverlay.querySelector(".modal");
-      if (!modal) { if (btn) { btn.disabled = false; btn.textContent = prevText; } return; }
-
-      const exportHost = document.createElement("div");
-      exportHost.style.position = "fixed";
-      exportHost.style.left = "-100000px";
-      exportHost.style.top = "0";
-      exportHost.style.width = "820px";
-      exportHost.style.padding = "0";
-      exportHost.style.margin = "0";
-      exportHost.style.background = "#ffffff";
-      exportHost.style.color = "#111827";
-      exportHost.style.zIndex = "999999";
-      exportHost.setAttribute("aria-hidden", "true");
-
-      const clone = modal.cloneNode(true);
-
-      // Quitar botones de acción (exportar/cerrar) del clon
-      const actions = clone.querySelector(".modal-actions");
-      if (actions) actions.remove();
-
-      // Quitar sombras para una exportación más limpia (mantiene borde y colores)
-      clone.style.boxShadow = "none";
-
-      // Evitar IDs duplicados
-      (function stripIds(el){
-        if (!el || !el.querySelectorAll) return;
-        if (el.id) el.removeAttribute("id");
-        el.querySelectorAll("[id]").forEach(n => n.removeAttribute("id"));
-      })(clone);
-
-      exportHost.appendChild(clone);
-      document.body.appendChild(exportHost);
-
-      try{
-        if (document.fonts && document.fonts.ready) {
-          try { await document.fonts.ready; } catch(e){ /* ignore */ }
-        }
-
-        const canvas = await window.html2canvas(exportHost, {
-          scale: 2,
-          backgroundColor: "#ffffff",
-          useCORS: true,
-          logging: false
-        });
-
-        const imgData = canvas.toDataURL("image/png", 1.0);
-        const { jsPDF } = window.jspdf;
-
-        const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 24;
-        const usableWidth = pageWidth - margin * 2;
-        const usableHeight = pageHeight - margin * 2;
-
-        const imgWidth = usableWidth;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        let heightLeft = imgHeight;
-        let y = margin;
-
-        // Primera página
-        pdf.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
-        heightLeft -= usableHeight;
-
-        // Páginas extra (desplazando la misma imagen hacia arriba)
-        while (heightLeft > 0) {
-          pdf.addPage();
-          y = margin - (imgHeight - heightLeft);
-          pdf.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
-          heightLeft -= usableHeight;
-        }
-
-        const mode = winnerOverlay.dataset.mode || "winners";
-        pdf.save(makePdfFileName(mode));
-      } catch(err){
-        console.error("Error al exportar PDF:", err);
-        // Respaldo: impresión
-        if (!printArea) { window.print(); }
-        else { setTimeout(() => window.print(), 50); }
-      } finally{
-        exportHost.remove();
-        if (btn) { btn.disabled = false; btn.textContent = prevText; }
+    const writeWrapped = (text, indent = 0, maxW = pageW - marginX * 2 - indent) => {
+      const lines = pdf.splitTextToSize(String(text || ""), maxW);
+      for (const ln of lines) {
+        ensureSpace();
+        pdf.text(ln, marginX + indent, y);
+        y += lineH;
       }
+    };
+
+    if (groupCards.length) {
+      groupCards.forEach((card, idx) => {
+        const title = card.querySelector(".group-title")?.innerText?.trim() || `Grupo ${idx + 1}`;
+        const members = Array.from(card.querySelectorAll(".member-pill")).map(p => p.innerText.trim()).filter(Boolean);
+
+        ensureSpace(10);
+        pdf.setFont("helvetica", "bold");
+        writeWrapped(title, 0);
+
+        pdf.setFont("helvetica", "normal");
+        if (members.length) {
+          members.forEach(m => writeWrapped(`- ${m}`, 4));
+        } else {
+          writeWrapped("- (sin integrantes)", 4);
+        }
+        y += 4;
+      });
+    } else {
+      // Fallback: si no hay tarjetas (modo ganadores simple)
+      const items = Array.from(listEl.querySelectorAll(".item, li, div"))
+        .map(n => n.innerText?.trim())
+        .filter(Boolean);
+
+      pdf.setFont("helvetica", "normal");
+      items.forEach(t => writeWrapped(`- ${t}`, 0));
     }
+
+    const safeName = titleText.toLowerCase().replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "");
+    pdf.save((safeName || "resultado") + ".pdf");
+  } catch (err) {
+    console.error(err);
+    alert("No se pudo generar el PDF. Revisa la consola para más detalles.");
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = prevText; }
+  }
+}
+
+
 
 
 
