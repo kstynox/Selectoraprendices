@@ -2002,20 +2002,41 @@ function normKey(s) {
       if (groupsPanel) groupsPanel.style.display = "none";
     }
 
-    function getListForGroups() {
-      let list = parseParticipants(wordsInput.value);
+    function getEntriesForGroups() {
+      let entries = parseParticipantsWeighted(wordsInput.value);
       if (dedupeToggle && dedupeToggle.checked) {
-        list = dedupeList(list).list;
+        entries = dedupeEntriesByName(entries).entries;
       }
-      return list.filter(Boolean);
+      return entries.filter(e => e && e.name);
     }
 
-    function buildGroupsRoundRobin(list, k) {
-      const shuffled = shuffle(list);
+    function getListForGroups() {
+      return getEntriesForGroups().map(e => e.name);
+    }
+
+    function buildGroupsRoundRobin(entries, k) {
       const groups = Array.from({ length: k }, () => []);
-      for (let i = 0; i < shuffled.length; i++) {
-        groups[i % k].push(shuffled[i]);
+      if (!Array.isArray(entries) || entries.length === 0) return groups;
+
+      const shuffled = shuffle(entries);
+      const forced = shuffled.filter(e => e && e.force);
+      const normal = shuffled.filter(e => e && !e.force);
+
+      // Si hay participantes con "..", todos quedan en el mismo grupo.
+      const forcedGroupIndex = forced.length ? Math.floor(Math.random() * k) : -1;
+      if (forcedGroupIndex >= 0) {
+        groups[forcedGroupIndex].push(...forced.map(e => e.name));
       }
+
+      // Repartir el resto intentando mantener equilibrio entre grupos.
+      for (const entry of normal) {
+        let target = 0;
+        for (let i = 1; i < groups.length; i++) {
+          if (groups[i].length < groups[target].length) target = i;
+        }
+        groups[target].push(entry.name);
+      }
+
       return groups;
     }
 
@@ -2114,7 +2135,8 @@ winnerOverlay.classList.add("show");
     }
 
     function generateGroups({ auto = false } = {}) {
-      const list = getListForGroups();
+      const entries = getEntriesForGroups();
+      const list = entries.map(e => e.name);
 
       // UI sincronizada (máximos y nombres)
       syncGroupNamesUI(list.length);
@@ -2153,7 +2175,7 @@ winnerOverlay.classList.add("show");
 
       groupsCount.value = String(k);
 
-      const groups = buildGroupsRoundRobin(list, k);
+      const groups = buildGroupsRoundRobin(entries, k);
       renderGroups(groups, groupNames);
       return groups;
     }
